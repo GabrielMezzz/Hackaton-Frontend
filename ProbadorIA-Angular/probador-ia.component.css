@@ -1,0 +1,99 @@
+/* Bloque del probador con IA · tokens de primary.com
+   Solo estilos de la herramienta: el detalle y la pagina los pone el host. */
+
+:host { display: block; }
+
+.pw-ac-consent { border: 1px solid #000; padding: 20px; background: #fff; }
+.pw-ac-consent label { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; line-height: 1.5; }
+.pw-ac-consent input[type='checkbox'] { width: 20px; height: 20px; margin-top: 2px; accent-color: #000; flex: none; }
+.pw-ac-consent .note { font-size: 14px; line-height: 1.5; margin: 12px 0 0 32px; }
+
+.pw-ac-tool { margin-top: 24px; border-top: 1px solid #f2eee3; padding-top: 24px; }
+.pw-ac-tool__title { font-size: 18px; font-weight: 500; letter-spacing: -.01em; margin: 0 0 4px; }
+.pw-ac-tool__sub { font-size: 14px; line-height: 1.5; color: #555; margin: 0 0 20px; }
+
+.pw-ac-drop {
+  display: block; border: 1px dashed #999; padding: 32px; text-align: center;
+  background: #fff; cursor: pointer;
+}
+.pw-ac-drop:hover, .pw-ac-drop.drag { border-color: #000; }
+.pw-ac-drop .ico { font-size: 28px; }
+.pw-ac-drop .or {
+  font-family: sohne-mono, 'Courier New', monospace; font-size: 11px; font-weight: 300;
+  text-transform: uppercase; letter-spacing: 1px; color: #666; margin-top: 14px;
+}
+.pw-ac-tool input[type='file'] { display: none; }
+
+.pw-ac-preview { margin-top: 20px; display: flex; gap: 16px; align-items: center; }
+.pw-ac-preview img { width: 88px; height: 88px; object-fit: cover; }
+.pw-ac-preview .meta { font-size: 14px; line-height: 1.5; }
+.pw-ac-preview .change { font-size: 13px; text-decoration: underline; cursor: pointer; }
+
+.pw-ac-actions { margin-top: 24px; display: flex; gap: 16px; flex-wrap: wrap; }
+.pw-btn {
+  display: inline-block; border-radius: 32px; font-size: 16px; line-height: 1.5;
+  padding: 16px 24px; min-width: 54px; text-align: center; border: 0;
+  font-family: poppins, Arial, sans-serif;
+  transition: background 80ms ease-in, opacity 80ms ease-in;
+}
+.pw-btn--primary { background: #000; color: #fff; }
+.pw-btn--primary:hover { background: rgba(0, 0, 0, .84); }
+.pw-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.pw-ac-loading { display: none; margin-top: 24px; text-align: center; font-size: 14px; }
+.pw-ac-loading.show { display: block; }
+.pw-ac-spinner {
+  width: 36px; height: 36px; border-radius: 50%; border: 4px solid #ddd; border-top-color: #000;
+  margin: 0 auto 12px; animation: pwacspin 1s linear infinite;
+}
+@keyframes pwacspin { to { transform: rotate(360deg); } }
+
+.pw-ac-ba { position: relative; margin-top: 28px; overflow: hidden; background: #f2eee3; aspect-ratio: 3 / 4; }
+.pw-ac-ba .layer { position: absolute; inset: 0; }
+.pw-ac-ba .layer img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pw-ac-ba .garment { opacity: .55; mix-blend-mode: multiply; }
+.pw-ac-ba .divider { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: #fff; transform: translateX(-50%); cursor: ew-resize; z-index: 6; }
+.pw-ac-ba .knob {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1px solid #000; color: #000;
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.pw-ac-ba .tag {
+  position: absolute; top: 12px; z-index: 5; background: rgba(255, 255, 255, .9); color: #000;
+  font-family: sohne-mono, 'Courier New', monospace; font-size: 11px; font-weight: 300; padding: 4px 10px;
+}
+.pw-ac-ba .tag.after { right: 12px; }
+.pw-ac-ba .tag.before { left: 12px; }
+.pw-ac-ba-caption {
+  margin-top: 14px; font-family: sohne-mono, 'Courier New', monospace;
+  font-size: 11px; font-weight: 300; text-align: center; color: #666;
+}
+
+/* ---------- recuadro del probador, antes/después y barra de acciones ---------- */
+.pw-ac-tool { border: 1px solid #000; border-radius: 6px; padding: 24px; margin-top: 32px; padding-top: 24px; }
+.pw-ac-tool .pw-ac-consent { border: 1px solid #e6e0d3; border-radius: 6px; padding: 16px; background: #faf8f3; }
+.pw-ac-tool .pw-ac-consent .note { color: #666; }
+.pw-ac-consent.is-ok .note { display: none; }
+.pw-ac-tool__body { margin-top: 20px; }
+.pw-ac-drop { border-radius: 6px; }
+.pw-ac-drop.drag { background: #faf8f3; }
+.pw-ac-drop:focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+.pw-ac-err { color: #b00020; font-size: 13px; margin: 10px 0 0; }
+
+.pw-ac-ba { margin-top: 0; border-radius: 6px; max-height: 72vh; touch-action: pan-y; user-select: none; cursor: ew-resize; }
+.pw-ac-ba .layer.before { z-index: 2; }
+.pw-ac-ba .layer.after { z-index: 1; }
+.pw-ac-ba .garment { display: none; }
+.pw-ac-ba .divider { width: 3px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .15); pointer-events: none; }
+.pw-ac-ba .knob { pointer-events: auto; cursor: ew-resize; padding: 0; font-family: inherit; box-shadow: 0 2px 8px rgba(0, 0, 0, .18); }
+.pw-ac-ba .knob:focus-visible { outline: 2px solid #000; outline-offset: 3px; }
+.pw-ac-ba .tag { border-radius: 20px; z-index: 7; }
+
+.pw-btn--secondary { background: transparent; color: #000; border: 1px solid #000; }
+.pw-btn--secondary:hover { background: rgba(0, 0, 0, .04); }
+.pw-ac-tool__bar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.pw-ac-tool__bar .pw-btn { width: 100%; padding: 12px 16px; font-size: 14px; text-decoration: none; }
+.pw-ac-demo-flag { margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: #666; text-align: center; }
+
+@media (max-width: 900px) { .pw-ac-tool { padding: 18px; } }
+@media (max-width: 360px) { .pw-ac-tool__bar { grid-template-columns: 1fr; } }
