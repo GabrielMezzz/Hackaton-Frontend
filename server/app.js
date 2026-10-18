@@ -42,6 +42,10 @@ const CFG = {
   quality: process.env.POLLINATIONS_QUALITY || 'high',
   perDay: Number(process.env.PRUEBAS_POR_DIA) || 2,
   timeZone: process.env.ZONA_HORARIA || 'America/Lima',
+  // Webhook de cotizaciones (n8n u otro servicio)
+  webhookOrderUrl: process.env.WEBHOOK_ORDER_URL || 'http://169.58.74.99:5678/webhook-test/web-order',
+  // URL real del frontend (para reemplazar el placeholder catalog_url de n8n)
+  frontendUrl: process.env.FRONTEND_URL || 'https://angibellcreaciones.com',
   // detras de un proxy (Render, Railway, Nginx...) la IP real viene en X-Forwarded-For
   // en Vercel siempre hay proxy: la IP real del cliente viene en X-Forwarded-For
   trustProxy: process.env.TRUST_PROXY === '1' || !!process.env.VERCEL,
@@ -428,6 +432,55 @@ const TYPES = {
   '.woff2': 'font/woff2', '.md': 'text/plain; charset=utf-8'
 };
 
+/* ===================== Webhook de Cotizaciones (n8n) ===================== */
+async function handleWebhookOrder(req, res) {
+  const b = await readJson(req).catch(() => ({}));
+  const target = CFG.webhookOrderUrl;
+  const hasMsg = b && typeof b.message === 'string' && b.message.trim().length > 0;
+
+  const headers = {};
+  let bodyData;
+  if (hasMsg) {
+    headers['Content-Type'] = 'application/json';
+    bodyData = JSON.stringify({ message: b.message.trim() });
+  }
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 20000);
+  try {
+    const r = await fetch(target, {
+      method: 'POST',
+      headers: Object.keys(headers).length ? headers : undefined,
+      body: bodyData,
+      signal: ctrl.signal
+    });
+    clearTimeout(timer);
+    const contentType = r.headers.get('content-type') || '';
+    let data;
+    if (contentType.includes('application/json')) {
+      data = await r.json();
+    } else {
+      const text = await r.text();
+      try { data = JSON.parse(text); }
+      catch (_) { data = { message: text }; }
+    }
+    // Si n8n devolvió el placeholder catalog_url, lo reemplazamos por la URL real del frontend
+    if (data && typeof data === 'object' && data.catalog_url) {
+      data.catalog_url = CFG.frontendUrl;
+    }
+    return send(res, r.status, data);
+  } catch (err) {
+    clearTimeout(timer);
+    console.error('[webhook-order]', err.message);
+    if (err.name === 'AbortError') {
+      return send(res, 504, { error: 'El servicio de cotizaciones tardó demasiado en responder.' });
+    }
+    return send(res, 502, {
+      error: 'No se pudo conectar con el webhook de cotización: ' + err.message
+    });
+  }
+}
+
 function serveStatic(req, res) {
   let rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   if (rel === '/') rel = '/Angibellcreaciones.html';
@@ -463,6 +516,9 @@ async function handler(req, res) {
       if (!pool) return send(res, 503, { error: 'Falta configurar DATABASE_URL en el servidor.' });
       await ensureDb();
       return send(res, 201, await db.registrarPedido(pool, await readJson(req)));
+    }
+    if (url.pathname === '/api/webhook-order' && req.method === 'POST') {
+      return await handleWebhookOrder(req, res);
     }
     if (url.pathname.startsWith('/api/')) return send(res, 404, { error: 'No encontrado' });
     if (req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end(); }
