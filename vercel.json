@@ -1,28 +1,36 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "services": {
-    "frontend": {
-      "root": "frontend",
-      "framework": "angular"
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@angular/cli",
+      "args": ["build"]
     },
-    "server": {
-      "root": "server",
-      "runtime": "node",
-      "entrypoint": "index.js"
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/dist/frontend/browser/$1"
+    }
+  ],
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 60,
+      "includeFiles": "db/**"
     }
   },
-  "rewrites": [
+  "headers": [
     {
       "source": "/api/(.*)",
-      "destination": {
-        "service": "server"
-      }
-    },
-    {
-      "source": "/(.*)",
-      "destination": {
-        "service": "frontend"
-      }
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
     }
   ]
 }
