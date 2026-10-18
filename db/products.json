@@ -463,11 +463,11 @@
     "audience": "ninas",
     "material": "fabric-covered headband with a soft satin bow",
     "colors": [
-      { "color": "rosa", "hex": "#f08aa6", "photo_id": 5094376, "position": 0 },
+      { "color": "Rosa", "hex": "#f08aa6", "photo_id": 5094376, "position": 0 },
       { "color": "Beige", "hex": "#e3d2b5", "photo_id": 26509786, "position": 1 }
     ],
     "variants": [
-      { "size": "Unica", "color": "rosa", "price": null, "stock": 4 },
+      { "size": "Unica", "color": "Rosa", "price": null, "stock": 4 },
       { "size": "Unica", "color": "Beige", "price": null, "stock": 4 }
     ]
   }

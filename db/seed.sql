@@ -1,33 +1,60 @@
--- Catalogo de la tienda web Angibell creaciones (ropa infantil).
--- Reemplaza al antiguo inventario.js. Idempotente: se puede correr varias veces
--- (no pisa cambios hechos luego en precios o stock).
---
--- products.id         = SKU de la prenda
--- products.store_key  = codigo de la tarjeta en la pagina (FL-...)
--- product_colors      = los dos colores de cada prenda con su foto de Pexels
--- product_variants    = stock por talla y color (price NULL = base_price)
+-- Catalogo de la tienda web Angibell creaciones generado desde db/products.json.
+-- Idempotente y reactivo: actualiza precios, stock, materiales y categorias si cambian en el JSON.
+-- Ejecutable de forma segura multiples veces.
 
-INSERT INTO products (id, name, description, base_price, store_key, category, audience) VALUES
-    ('TER-001', 'Terno para niños', 'Terno · Niños', 250.00, 'FL-63E73D38', 'Terno', 'ninos'),
-    ('TER-002', 'Terno de gala para niño', 'Terno · Niños', 250.00, 'FL-95675A2E', 'Terno', 'ninos'),
-    ('BLA-001', 'Blaser para niños', 'Blazer · Niños', 95.00, 'FL-D5D758B5', 'Blazer', 'ninos'),
-    ('CON-001', 'Conjunto Jean para niños', 'Conjunto · Niños', 155.00, 'FL-7A5767B6', 'Conjunto', 'ninos'),
-    ('PAN-001', 'Pantalón Jean para niños', 'Pantalon · Niños', 78.00, 'FL-87A6368E', 'Pantalon', 'ninos'),
-    ('TIR-001', 'Tirantes de pantalón para niños', 'Accesorio · Niños', 20.00, 'FL-87A63626', 'Accesorio', 'ninos'),
-    ('CAL-001', 'Zapatos en charol negro para niños', 'Calzado · Niños', 74.00, 'FL-63E7A7ED', 'Calzado', 'ninos'),
-    ('PAN-002', 'Pantalón para niños de vestir en dill', 'Pantalon · Niños', 73.00, 'FL-63E7A7A9', 'Pantalon', 'ninos'),
-    ('VES-001', 'Vestido para niñas en gasa francesa color blanco', 'Vestido · Niñas', 250.00, 'FL-87858D22', 'Vestido', 'ninas'),
-    ('VES-002', 'Vestido Floreado rojo para niña', 'Vestido · Niñas', 95.00, 'FL-7A57A352', 'Vestido', 'ninas'),
-    ('VES-003', 'Vestido de niña en gasa de seda', 'Vestido · Niñas', 260.00, 'FL-9567552E', 'Vestido', 'ninas'),
-    ('VES-004', 'Vestido Floreado azul para niña', 'Vestido · Niñas', 95.00, 'FL-B8D98B59', 'Vestido', 'ninas'),
-    ('CON-002', 'Conjunto de niña: pantalón cargo y polo', 'Conjunto · Niñas', 125.00, 'FL-956759D3', 'Conjunto', 'ninas'),
-    ('CON-003', 'Conjunto para niña: pantalón y polo', 'Conjunto · Niñas', 125.00, 'FL-579576AE', 'Conjunto', 'ninas'),
-    ('CAL-002', 'Zapatos para niñas en gamuza importada', 'Calzado · Niñas', 65.00, 'FL-7A57A382', 'Calzado', 'ninas'),
-    ('ACC-001', 'Panty para niñas', 'Accesorio · Niñas', 18.00, 'FL-B8D98A58', 'Accesorio', 'ninas'),
-    ('ACC-002', 'Medias con blondas para niñas', 'Accesorio · Niñas', 12.00, 'FL-D5D75B98', 'Accesorio', 'ninas'),
-    ('ACC-003', 'Vincha para niña', 'Accesorio · Niñas', 15.00, 'FL-D5D75A8B', 'Accesorio', 'ninas')
-ON CONFLICT (id) DO NOTHING;
+BEGIN;
 
+-- 1. CATEGORIAS
+INSERT INTO categories (name, slug, description, active) VALUES
+    ('Terno', 'terno', 'Prendas y accesorios en la categoría Terno', true),
+    ('Blazer', 'blazer', 'Prendas y accesorios en la categoría Blazer', true),
+    ('Conjunto', 'conjunto', 'Prendas y accesorios en la categoría Conjunto', true),
+    ('Pantalon', 'pantalon', 'Prendas y accesorios en la categoría Pantalon', true),
+    ('Accesorio', 'accesorio', 'Prendas y accesorios en la categoría Accesorio', true),
+    ('Calzado', 'calzado', 'Prendas y accesorios en la categoría Calzado', true),
+    ('Vestido', 'vestido', 'Prendas y accesorios en la categoría Vestido', true)
+ON CONFLICT (name) DO UPDATE SET
+    slug = EXCLUDED.slug,
+    description = EXCLUDED.description,
+    active = EXCLUDED.active;
+
+-- 2. PRODUCTOS (con store_key, audience y material)
+INSERT INTO products (id, name, description, base_price, store_key, category, audience, material) VALUES
+    ('TER-001', 'Terno para niños', 'Terno · Niños', 250.00, 'FL-63E73D38', 'Terno', 'ninos', 'tailored wool-blend suiting with a fine matte weave, structured lapels and padded shoulders'),
+    ('TER-002', 'Terno de gala para niño', 'Terno · Niños', 250.00, 'FL-95675A2E', 'Terno', 'ninos', 'formal wool-blend suiting with a smooth matte finish, matching waistcoat'),
+    ('BLA-001', 'Blaser para niños', 'Blazer · Niños', 95.00, 'FL-D5D758B5', 'Blazer', 'ninos', 'structured wool-blend blazer fabric with a subtle twill texture'),
+    ('CON-001', 'Conjunto Jean para niños', 'Conjunto · Niños', 155.00, 'FL-7A5767B6', 'Conjunto', 'ninos', 'washed cotton denim with visible twill, stitching and metal buttons'),
+    ('PAN-001', 'Pantalón Jean para niños', 'Pantalon · Niños', 78.00, 'FL-87A6368E', 'Pantalon', 'ninos', 'cotton denim with visible diagonal twill and contrast stitching'),
+    ('TIR-001', 'Tirantes de pantalón para niños', 'Accesorio · Niños', 20.00, 'FL-87A63626', 'Accesorio', 'ninos', 'elastic woven webbing with leather tabs and metal clips'),
+    ('CAL-001', 'Zapatos en charol negro para niños', 'Calzado · Niños', 74.00, 'FL-63E7A7ED', 'Calzado', 'ninos', 'glossy patent leather with a mirror-like shine'),
+    ('PAN-002', 'Pantalón para niños de vestir en dill', 'Pantalon · Niños', 73.00, 'FL-63E7A7A9', 'Pantalon', 'ninos', 'light cotton twill dress trousers with a crisp crease'),
+    ('VES-001', 'Vestido para niñas en gasa francesa color blanco', 'Vestido · Niñas', 250.00, 'FL-87858D22', 'Vestido', 'ninas', 'airy French chiffon in layered, flowing tiers'),
+    ('VES-002', 'Vestido Floreado rojo para niña', 'Vestido · Niñas', 95.00, 'FL-7A57A352', 'Vestido', 'ninas', 'soft cotton poplin with a printed floral pattern'),
+    ('VES-003', 'vestido de niña en gasa de seda', 'Vestido · Niñas', 260.00, 'FL-9567552E', 'Vestido', 'ninas', 'silk chiffon with a soft sheen and gathered tulle skirt'),
+    ('VES-004', 'vestido Floreado azul para niña', 'Vestido · Niñas', 95.00, 'FL-B8D98B59', 'Vestido', 'ninas', 'light cotton fabric with a printed pattern'),
+    ('CON-002', 'Conjunto de niña: pantalón cargo y polo', 'Conjunto · Niñas', 125.00, 'FL-956759D3', 'Conjunto', 'ninas', 'cotton cargo trousers with patch pockets and a soft jersey polo'),
+    ('CON-003', 'Conjunto para niña: pantalón y polo', 'Conjunto · Niñas', 125.00, 'FL-579576AE', 'Conjunto', 'ninas', 'cotton trousers with a soft jersey polo shirt'),
+    ('CAL-002', 'Vapatos para niñas en gamuza importada', 'Calzado · Niñas', 65.00, 'FL-7A57A382', 'Calzado', 'ninas', 'soft matte suede with a velvety nap'),
+    ('ACC-001', 'Panty para niñas', 'Accesorio · Niñas', 18.00, 'FL-B8D98A58', 'Accesorio', 'ninas', 'fine opaque knit nylon tights'),
+    ('ACC-002', 'Medias con blondas para niñas', 'Accesorio · Niñas', 12.00, 'FL-D5D75B98', 'Accesorio', 'ninas', 'soft cotton knit socks with delicate lace trim'),
+    ('ACC-003', 'vincha para niña', 'Accesorio · Niñas', 15.00, 'FL-D5D75A8B', 'Accesorio', 'ninas', 'fabric-covered headband with a soft satin bow')
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    description = EXCLUDED.description,
+    base_price = EXCLUDED.base_price,
+    store_key = EXCLUDED.store_key,
+    category = EXCLUDED.category,
+    audience = EXCLUDED.audience,
+    material = EXCLUDED.material;
+
+-- 3. ASOCIACION PRODUCTOS - CATEGORIAS
+INSERT INTO category_products (category_id, product_id)
+SELECT c.id, p.id
+FROM products p
+JOIN categories c ON c.name = p.category
+ON CONFLICT (category_id, product_id) DO NOTHING;
+
+-- 4. COLORES DE PRODUCTOS
 INSERT INTO product_colors (product_id, color, hex, photo_id, position) VALUES
     ('TER-001', 'Azul', '#2c4a8c', 34796127, 0),
     ('TER-001', 'Negro', '#1c1c1c', 36909807, 1),
@@ -65,8 +92,12 @@ INSERT INTO product_colors (product_id, color, hex, photo_id, position) VALUES
     ('ACC-002', 'Amarillo', '#f2c230', 5325678, 1),
     ('ACC-003', 'Rosa', '#f08aa6', 5094376, 0),
     ('ACC-003', 'Beige', '#e3d2b5', 26509786, 1)
-ON CONFLICT (product_id, color) DO NOTHING;
+ON CONFLICT (product_id, color) DO UPDATE SET
+    hex = EXCLUDED.hex,
+    photo_id = EXCLUDED.photo_id,
+    position = EXCLUDED.position;
 
+-- 5. VARIANTES (Tallas, precios especificos y stock)
 INSERT INTO product_variants (product_id, size, color, price, stock) VALUES
     ('TER-001', '0', 'Azul', NULL, 2),
     ('TER-001', '0', 'Negro', NULL, 1),
@@ -252,25 +283,8 @@ INSERT INTO product_variants (product_id, size, color, price, stock) VALUES
     ('ACC-002', 'M', 'Amarillo', NULL, 2),
     ('ACC-003', 'Unica', 'Rosa', NULL, 4),
     ('ACC-003', 'Unica', 'Beige', NULL, 4)
-ON CONFLICT (product_id, size, color) DO NOTHING;
+ON CONFLICT (product_id, size, color) DO UPDATE SET
+    price = EXCLUDED.price,
+    stock = EXCLUDED.stock;
 
--- Material y textura de cada prenda (para el probador con IA).
--- Solo se completa si esta vacio: no pisa lo que se edite despues.
-UPDATE products SET material = 'tailored wool-blend suiting with a fine matte weave, structured lapels and padded shoulders' WHERE id = 'TER-001' AND material IS NULL;
-UPDATE products SET material = 'formal wool-blend suiting with a smooth matte finish, matching waistcoat' WHERE id = 'TER-002' AND material IS NULL;
-UPDATE products SET material = 'structured wool-blend blazer fabric with a subtle twill texture' WHERE id = 'BLA-001' AND material IS NULL;
-UPDATE products SET material = 'washed cotton denim with visible twill, stitching and metal buttons' WHERE id = 'CON-001' AND material IS NULL;
-UPDATE products SET material = 'cotton denim with visible diagonal twill and contrast stitching' WHERE id = 'PAN-001' AND material IS NULL;
-UPDATE products SET material = 'elastic woven webbing with leather tabs and metal clips' WHERE id = 'TIR-001' AND material IS NULL;
-UPDATE products SET material = 'glossy patent leather with a mirror-like shine' WHERE id = 'CAL-001' AND material IS NULL;
-UPDATE products SET material = 'light cotton twill dress trousers with a crisp crease' WHERE id = 'PAN-002' AND material IS NULL;
-UPDATE products SET material = 'airy French chiffon in layered, flowing tiers' WHERE id = 'VES-001' AND material IS NULL;
-UPDATE products SET material = 'soft cotton poplin with a printed floral pattern' WHERE id = 'VES-002' AND material IS NULL;
-UPDATE products SET material = 'silk chiffon with a soft sheen and gathered tulle skirt' WHERE id = 'VES-003' AND material IS NULL;
-UPDATE products SET material = 'light cotton fabric with a printed pattern' WHERE id = 'VES-004' AND material IS NULL;
-UPDATE products SET material = 'cotton cargo trousers with patch pockets and a soft jersey polo' WHERE id = 'CON-002' AND material IS NULL;
-UPDATE products SET material = 'cotton trousers with a soft jersey polo shirt' WHERE id = 'CON-003' AND material IS NULL;
-UPDATE products SET material = 'soft matte suede with a velvety nap' WHERE id = 'CAL-002' AND material IS NULL;
-UPDATE products SET material = 'fine opaque knit nylon tights' WHERE id = 'ACC-001' AND material IS NULL;
-UPDATE products SET material = 'soft cotton knit socks with delicate lace trim' WHERE id = 'ACC-002' AND material IS NULL;
-UPDATE products SET material = 'fabric-covered headband with a soft satin bow' WHERE id = 'ACC-003' AND material IS NULL;
+COMMIT;
