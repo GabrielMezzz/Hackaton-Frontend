@@ -5,6 +5,7 @@
   "engines": { "node": ">=18" },
   "scripts": {
     "start": "node server/server.js",
+    "build": "cd frontend && npm install && npm run build",
     "db:init": "node server/db-init.js",
     "seed:generate": "node db/generate-seed.js",
     "seed": "node db/seed-from-json.js",
