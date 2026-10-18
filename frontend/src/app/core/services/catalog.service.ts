@@ -32,8 +32,9 @@ export class CatalogService {
         if (data && Array.isArray(data.categorias) && data.categorias.length > 0) {
           this.categories.set(data.categorias);
         } else {
-          // Fallback a endpoint de categorías
-          const catUrl = isFallback ? 'http://localhost:8080/api/categories' : '/api/categories';
+          // Fallback a endpoint de categorías (mismo host, no localhost:
+          // asi tambien funciona al abrir la app desde el celular en la red local)
+          const catUrl = isFallback ? `${backendOrigin()}/api/categories` : '/api/categories';
           this.http.get<Category[]>(catUrl).subscribe({
             next: (cats) => {
               if (Array.isArray(cats)) this.categories.set(cats);
@@ -104,10 +105,11 @@ export class CatalogService {
       },
       error: (err) => {
         console.warn(`[CatalogService] Error en ${apiUrl}:`, err);
-        // Si estamos en desarrollo en puerto 4200 y falló /api/catalogo, intentar directo a http://localhost:8080
+        // Si estamos en desarrollo en puerto 4200 y falló /api/catalogo, intentar directo al backend
         if (!isFallback && typeof window !== 'undefined' && window.location.port === '4200') {
-          console.info('[CatalogService] Reintentando con backend directo http://localhost:8080/api/catalogo...');
-          this.fetchCatalog('http://localhost:8080/api/catalogo', true);
+          const directo = `${backendOrigin()}/api/catalogo`;
+          console.info(`[CatalogService] Reintentando con backend directo ${directo}...`);
+          this.fetchCatalog(directo, true);
           return;
         }
 
@@ -125,4 +127,11 @@ export class CatalogService {
       p.id === idOrSku || p.sku === idOrSku || p.key === idOrSku
     );
   }
+}
+
+// Origen del backend (puerto 8080) usando el host desde el que se abrio la pagina,
+// no "localhost": asi el celular en la red local tambien alcanza la API.
+function backendOrigin(): string {
+  if (typeof window === 'undefined') return 'http://localhost:8080';
+  return `http://${window.location.hostname}:8080`;
 }

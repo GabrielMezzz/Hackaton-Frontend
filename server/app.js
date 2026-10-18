@@ -31,6 +31,9 @@ require('./env').loadEnv();
 
 const CFG = {
   port: Number(process.env.PORT) || 8080,
+  // 0.0.0.0 = acepta conexiones de toda la red local (celulares, otras notebooks).
+  // Pon HOST=127.0.0.1 en server/.env si solo quieres acceso desde tu maquina.
+  host: process.env.HOST || '0.0.0.0',
   // proveedor del probador: cloudflare (Workers AI) | pollinations
   provider: (process.env.IA_PROVEEDOR || 'cloudflare').toLowerCase(),
   cfAccount: process.env.CF_ACCOUNT_ID || '',
@@ -747,9 +750,35 @@ async function handler(req, res) {
   }
 }
 
+/* IPs privadas de la red local (Wi-Fi / Ethernet) para mostrar la URL de acceso
+   en la consola. No lanza si el modulo no esta disponible: es solo informativo. */
+function ipsDeRed() {
+  try {
+    const os = require('node:os');
+    const { networkInterfaces: ni } = os;
+    const out = [];
+    for (const lista of Object.values(ni)) {
+      for (const net of lista || []) {
+        // Node 18+ devuelve family como numero (4); antes era la cadena 'IPv4'
+        const isV4 = net.family === 'IPv4' || net.family === 4;
+        if (isV4 && !net.internal && /^192\.168\./.test(net.address)) out.push(net.address);
+      }
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
 function startLocal() {
-  http.createServer(handler).listen(CFG.port, () => {
+  http.createServer(handler).listen(CFG.port, CFG.host, () => {
     console.log(`Angibell · tienda y probador IA en http://localhost:${CFG.port}`);
+    // si escucha en todas las interfaces, muestra tambien como entrar desde la red local
+    if (CFG.host === '0.0.0.0' || CFG.host === '::') {
+      for (const ip of ipsDeRed()) {
+        console.log(`Angibell · tambien en http://${ip}:${CFG.port}  (accesible desde la misma red)`);
+      }
+    }
     console.log(`IA: ${CFG.provider} · modelo ${IA_MODEL()} · ${CFG.perDay} pruebas por IP al día · zona ${CFG.timeZone}`);
     if (!IA_OK()) console.warn(CFG.provider === 'pollinations'
       ? 'AVISO: falta POLLINATIONS_API_KEY en server/.env; el probador responderá 503.'
