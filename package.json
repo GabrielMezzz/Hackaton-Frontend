@@ -1,10 +1,14 @@
 {
   "name": "angibell-creaciones",
   "private": true,
-  "description": "Tienda Angibell: pagina estatica + API (catalogo y pedidos en PostgreSQL, probador con IA)",
+  "description": "Tienda Angibell: Fullstack Angular + Node.js API (PostgreSQL + n8n Webhook)",
   "engines": { "node": ">=18" },
   "scripts": {
     "start": "node server/server.js",
+    "build:front": "npm --prefix frontend run build",
+    "build": "npm --prefix frontend run build",
+    "dev:front": "npm --prefix frontend run dev",
+    "dev:server": "node server/server.js",
     "test": "node server/test/db.test.js"
   },
   "dependencies": {

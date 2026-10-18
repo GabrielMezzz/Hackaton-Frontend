@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@layer theme {
+  :root {
+    --color-primary: #008069;
+    --color-primary-hover: #00a884;
+    --color-accent: #25d366;
+    --color-sand: #f2eee3;
+  }
+}

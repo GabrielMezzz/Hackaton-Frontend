@@ -93,9 +93,14 @@ function ensureDb() {
   if (!dbReady) {
     dbReady = (async () => {
       for (const f of ['schema.sql', 'seed.sql']) {
-        await pool.query(fs.readFileSync(path.join(__dirname, '..', 'db', f), 'utf8'));
+        try {
+          const sql = fs.readFileSync(path.join(__dirname, '..', 'db', f), 'utf8');
+          await pool.query(sql);
+        } catch (err) {
+          console.warn('[db:ensureDb]', f, err.message);
+        }
       }
-    })().catch((e) => { dbReady = null; throw e; });
+    })().catch((e) => { dbReady = null; });
   }
   return dbReady;
 }
@@ -435,7 +440,7 @@ const TYPES = {
 /* ===================== Webhook de Cotizaciones (n8n) ===================== */
 async function handleWebhookOrder(req, res) {
   const b = await readJson(req).catch(() => ({}));
-  const target = CFG.webhookOrderUrl;
+  let target = CFG.webhookOrderUrl;
   const hasMsg = b && typeof b.message === 'string' && b.message.trim().length > 0;
 
   const headers = {};
@@ -445,16 +450,38 @@ async function handleWebhookOrder(req, res) {
     bodyData = JSON.stringify({ message: b.message.trim() });
   }
 
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 20000);
+  const fetchWithTimeout = async (url) => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 20000);
+    try {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: Object.keys(headers).length ? headers : undefined,
+        body: bodyData,
+        signal: ctrl.signal
+      });
+      clearTimeout(timer);
+      return r;
+    } catch (e) {
+      clearTimeout(timer);
+      throw e;
+    }
+  };
+
   try {
-    const r = await fetch(target, {
-      method: 'POST',
-      headers: Object.keys(headers).length ? headers : undefined,
-      body: bodyData,
-      signal: ctrl.signal
-    });
-    clearTimeout(timer);
+    let r = await fetchWithTimeout(target);
+    // Si n8n responde 404 porque el webhook de prueba no está escuchando en el canvas,
+    // reintentamos hacia el webhook activo/producción (/webhook/web-order)
+    if (r.status === 404 && target.includes('/webhook-test/')) {
+      const fallbackTarget = target.replace('/webhook-test/', '/webhook/');
+      try {
+        const rFallback = await fetchWithTimeout(fallbackTarget);
+        if (rFallback.ok) {
+          r = rFallback;
+        }
+      } catch (_) {}
+    }
+
     const contentType = r.headers.get('content-type') || '';
     let data;
     if (contentType.includes('application/json')) {
@@ -470,7 +497,6 @@ async function handleWebhookOrder(req, res) {
     }
     return send(res, r.status, data);
   } catch (err) {
-    clearTimeout(timer);
     console.error('[webhook-order]', err.message);
     if (err.name === 'AbortError') {
       return send(res, 504, { error: 'El servicio de cotizaciones tardó demasiado en responder.' });
@@ -482,18 +508,49 @@ async function handleWebhookOrder(req, res) {
 }
 
 function serveStatic(req, res) {
-  let rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+  const urlObj = new URL(req.url, 'http://x');
+  let rel = decodeURIComponent(urlObj.pathname);
+
+  // Comprobar si existe la compilación de Angular en frontend/dist/frontend/browser o frontend/dist/frontend
+  const angularBrowser = path.join(ROOT, 'frontend', 'dist', 'frontend', 'browser');
+  const angularRoot = path.join(ROOT, 'frontend', 'dist', 'frontend');
+  const angularDist = fs.existsSync(angularBrowser) ? angularBrowser : (fs.existsSync(angularRoot) ? angularRoot : null);
+
+  if (angularDist) {
+    let filePath = path.resolve(angularDist, '.' + rel);
+    const exists = fs.existsSync(filePath);
+    const isFile = exists && fs.statSync(filePath).isFile();
+    // Si es raíz o no es archivo existente, servir index.html de Angular (enrutador SPA)
+    if (!isFile) {
+      filePath = path.join(angularDist, 'index.html');
+    }
+
+    fs.stat(filePath, (err, st) => {
+      if (err || !st.isFile()) {
+        res.writeHead(404);
+        return res.end('No encontrado');
+      }
+      const ext = path.extname(filePath).toLowerCase();
+      const type = TYPES[ext] || 'application/octet-stream';
+      res.writeHead(200, {
+        'Content-Type': type,
+        'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable'
+      });
+      fs.createReadStream(filePath).pipe(res);
+    });
+    return;
+  }
+
+  // Fallback si Angular aún no ha sido compilado
   if (rel === '/') rel = '/Angibellcreaciones.html';
   const file = path.resolve(ROOT, '.' + rel);
-  // nada fuera de la tienda, ni el servidor (su .env y los cupos), ni archivos ocultos
   if (!file.startsWith(ROOT + path.sep) || file.startsWith(__dirname + path.sep) || /(^|[\\/])\./.test(path.relative(ROOT, file))) {
     res.writeHead(404); return res.end('No encontrado');
   }
   fs.stat(file, (err, st) => {
     if (err || !st.isFile()) { res.writeHead(404); return res.end('No encontrado'); }
     const ext = path.extname(file).toLowerCase();
-    // los CSS guardados de la tienda no tienen extension (css, css(1))
-    const type = TYPES[ext] || (/[\\/]css(\(\d\))?$/.test(file) ? 'text/css; charset=utf-8' : 'application/octet-stream');
+    const type = TYPES[ext] || 'application/octet-stream';
     res.writeHead(200, { 'Content-Type': type, 'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=300' });
     fs.createReadStream(file).pipe(res);
   });
