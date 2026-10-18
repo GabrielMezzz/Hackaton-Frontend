@@ -1,0 +1,474 @@
+[
+  {
+    "id": "TER-001",
+    "name": "Terno para niños",
+    "description": "Terno · Niños",
+    "base_price": 250.00,
+    "store_key": "FL-63E73D38",
+    "category": "Terno",
+    "audience": "ninos",
+    "material": "tailored wool-blend suiting with a fine matte weave, structured lapels and padded shoulders",
+    "colors": [
+      { "color": "Azul", "hex": "#2c4a8c", "photo_id": 34796127, "position": 0 },
+      { "color": "Negro", "hex": "#1c1c1c", "photo_id": 36909807, "position": 1 }
+    ],
+    "variants": [
+      { "size": "0", "color": "Azul", "price": null, "stock": 2 },
+      { "size": "0", "color": "Negro", "price": null, "stock": 1 },
+      { "size": "2", "color": "Azul", "price": null, "stock": 2 },
+      { "size": "2", "color": "Negro", "price": null, "stock": 2 },
+      { "size": "4", "color": "Azul", "price": null, "stock": 3 },
+      { "size": "4", "color": "Negro", "price": null, "stock": 2 },
+      { "size": "6", "color": "Azul", "price": null, "stock": 2 },
+      { "size": "6", "color": "Negro", "price": null, "stock": 2 },
+      { "size": "8", "color": "Azul", "price": null, "stock": 1 },
+      { "size": "8", "color": "Negro", "price": null, "stock": 1 },
+      { "size": "10", "color": "Azul", "price": null, "stock": 2 },
+      { "size": "10", "color": "Negro", "price": null, "stock": 1 },
+      { "size": "12", "color": "Azul", "price": null, "stock": 1 },
+      { "size": "12", "color": "Negro", "price": null, "stock": 0 },
+      { "size": "14", "color": "Azul", "price": null, "stock": 0 },
+      { "size": "14", "color": "Negro", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "TER-002",
+    "name": "Terno de gala para niño",
+    "description": "Terno · Niños",
+    "base_price": 250.00,
+    "store_key": "FL-95675A2E",
+    "category": "Terno",
+    "audience": "ninos",
+    "material": "formal wool-blend suiting with a smooth matte finish, matching waistcoat",
+    "colors": [
+      { "color": "Gris", "hex": "#8a8f98", "photo_id": 30720574, "position": 0 },
+      { "color": "Blanco", "hex": "#f4f1ea", "photo_id": 37472678, "position": 1 }
+    ],
+    "variants": [
+      { "size": "0", "color": "Gris", "price": null, "stock": 1 },
+      { "size": "0", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "2", "color": "Gris", "price": null, "stock": 2 },
+      { "size": "2", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "4", "color": "Gris", "price": null, "stock": 2 },
+      { "size": "4", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "6", "color": "Gris", "price": null, "stock": 3 },
+      { "size": "6", "color": "Blanco", "price": null, "stock": 2 },
+      { "size": "8", "color": "Gris", "price": null, "stock": 2 },
+      { "size": "8", "color": "Blanco", "price": null, "stock": 2 },
+      { "size": "10", "color": "Gris", "price": null, "stock": 1 },
+      { "size": "10", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "12", "color": "Gris", "price": null, "stock": 1 },
+      { "size": "12", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "14", "color": "Gris", "price": null, "stock": 1 },
+      { "size": "14", "color": "Blanco", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "BLA-001",
+    "name": "Blaser para niños",
+    "description": "Blazer · Niños",
+    "base_price": 95.00,
+    "store_key": "FL-D5D758B5",
+    "category": "Blazer",
+    "audience": "ninos",
+    "material": "structured wool-blend blazer fabric with a subtle twill texture",
+    "colors": [
+      { "color": "Negro", "hex": "#1c1c1c", "photo_id": 30690925, "position": 0 },
+      { "color": "Plateado", "hex": "#b9bcc2", "photo_id": 30522779, "position": 1 }
+    ],
+    "variants": [
+      { "size": "2", "color": "Negro", "price": null, "stock": 1 },
+      { "size": "2", "color": "Plateado", "price": null, "stock": 1 },
+      { "size": "4", "color": "Negro", "price": null, "stock": 2 },
+      { "size": "4", "color": "Plateado", "price": null, "stock": 2 },
+      { "size": "6", "color": "Negro", "price": null, "stock": 2 },
+      { "size": "6", "color": "Plateado", "price": null, "stock": 2 },
+      { "size": "8", "color": "Negro", "price": null, "stock": 2 },
+      { "size": "8", "color": "Plateado", "price": null, "stock": 1 },
+      { "size": "10", "color": "Negro", "price": null, "stock": 1 },
+      { "size": "10", "color": "Plateado", "price": null, "stock": 1 },
+      { "size": "12", "color": "Negro", "price": null, "stock": 0 },
+      { "size": "12", "color": "Plateado", "price": null, "stock": 0 },
+      { "size": "14", "color": "Negro", "price": null, "stock": 1 },
+      { "size": "14", "color": "Plateado", "price": null, "stock": 1 }
+    ]
+  },
+  {
+    "id": "CON-001",
+    "name": "Conjunto Jean para niños",
+    "description": "Conjunto · Niños",
+    "base_price": 155.00,
+    "store_key": "FL-7A5767B6",
+    "category": "Conjunto",
+    "audience": "ninos",
+    "material": "washed cotton denim with visible twill, stitching and metal buttons",
+    "colors": [
+      { "color": "Jean claro", "hex": "#8fb3d9", "photo_id": 4127424, "position": 0 },
+      { "color": "Jean azul", "hex": "#3b6ea8", "photo_id": 11202657, "position": 1 }
+    ],
+    "variants": [
+      { "size": "6", "color": "Jean claro", "price": null, "stock": 2 },
+      { "size": "6", "color": "Jean azul", "price": null, "stock": 1 },
+      { "size": "8", "color": "Jean claro", "price": null, "stock": 2 },
+      { "size": "8", "color": "Jean azul", "price": null, "stock": 1 },
+      { "size": "10", "color": "Jean claro", "price": null, "stock": 1 },
+      { "size": "10", "color": "Jean azul", "price": null, "stock": 1 },
+      { "size": "12", "color": "Jean claro", "price": null, "stock": 1 },
+      { "size": "12", "color": "Jean azul", "price": null, "stock": 1 },
+      { "size": "14", "color": "Jean claro", "price": null, "stock": 1 },
+      { "size": "14", "color": "Jean azul", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "PAN-001",
+    "name": "Pantalón Jean para niños",
+    "description": "Pantalon · Niños",
+    "base_price": 78.00,
+    "store_key": "FL-87A6368E",
+    "category": "Pantalon",
+    "audience": "ninos",
+    "material": "cotton denim with visible diagonal twill and contrast stitching",
+    "colors": [
+      { "color": "Jean azul", "hex": "#3b6ea8", "photo_id": 16396429, "position": 0 },
+      { "color": "Jean oscuro", "hex": "#2a3550", "photo_id": 6467972, "position": 1 }
+    ],
+    "variants": [
+      { "size": "6", "color": "Jean azul", "price": null, "stock": 2 },
+      { "size": "6", "color": "Jean oscuro", "price": null, "stock": 2 },
+      { "size": "8", "color": "Jean azul", "price": null, "stock": 3 },
+      { "size": "8", "color": "Jean oscuro", "price": null, "stock": 2 },
+      { "size": "10", "color": "Jean azul", "price": null, "stock": 2 },
+      { "size": "10", "color": "Jean oscuro", "price": null, "stock": 2 },
+      { "size": "12", "color": "Jean azul", "price": null, "stock": 2 },
+      { "size": "12", "color": "Jean oscuro", "price": null, "stock": 1 },
+      { "size": "14", "color": "Jean azul", "price": null, "stock": 1 },
+      { "size": "14", "color": "Jean oscuro", "price": null, "stock": 1 }
+    ]
+  },
+  {
+    "id": "TIR-001",
+    "name": "Tirantes de pantalón para niños",
+    "description": "Accesorio · Niños",
+    "base_price": 20.00,
+    "store_key": "FL-87A63626",
+    "category": "Accesorio",
+    "audience": "ninos",
+    "material": "elastic woven webbing with leather tabs and metal clips",
+    "colors": [
+      { "color": "Negro", "hex": "#1c1c1c", "photo_id": 15032427, "position": 0 },
+      { "color": "Marrón", "hex": "#6b4226", "photo_id": 1648535, "position": 1 }
+    ],
+    "variants": [
+      { "size": "2", "color": "Negro", "price": null, "stock": 3 },
+      { "size": "2", "color": "Marrón", "price": null, "stock": 2 },
+      { "size": "4", "color": "Negro", "price": null, "stock": 3 },
+      { "size": "4", "color": "Marrón", "price": null, "stock": 3 },
+      { "size": "6", "color": "Negro", "price": null, "stock": 2 },
+      { "size": "6", "color": "Marrón", "price": null, "stock": 2 },
+      { "size": "8", "color": "Negro", "price": null, "stock": 2 },
+      { "size": "8", "color": "Marrón", "price": null, "stock": 1 }
+    ]
+  },
+  {
+    "id": "CAL-001",
+    "name": "Zapatos en charol negro para niños",
+    "description": "Calzado · Niños",
+    "base_price": 74.00,
+    "store_key": "FL-63E7A7ED",
+    "category": "Calzado",
+    "audience": "ninos",
+    "material": "glossy patent leather with a mirror-like shine",
+    "colors": [
+      { "color": "Negro", "hex": "#161616", "photo_id": 34043978, "position": 0 },
+      { "color": "Marrón", "hex": "#6b4226", "photo_id": 38304090, "position": 1 }
+    ],
+    "variants": [
+      { "size": "8", "color": "Negro", "price": null, "stock": 1 },
+      { "size": "8", "color": "Marrón", "price": null, "stock": 1 },
+      { "size": "10", "color": "Negro", "price": null, "stock": 2 },
+      { "size": "10", "color": "Marrón", "price": null, "stock": 1 },
+      { "size": "12", "color": "Negro", "price": null, "stock": 1 },
+      { "size": "12", "color": "Marrón", "price": null, "stock": 1 },
+      { "size": "14", "color": "Negro", "price": null, "stock": 1 },
+      { "size": "14", "color": "Marrón", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "PAN-002",
+    "name": "Pantalón para niños de vestir en dill",
+    "description": "Pantalon · Niños",
+    "base_price": 73.00,
+    "store_key": "FL-63E7A7A9",
+    "category": "Pantalon",
+    "audience": "ninos",
+    "material": "light cotton twill dress trousers with a crisp crease",
+    "colors": [
+      { "color": "Blanco", "hex": "#f4f1ea", "photo_id": 35702667, "position": 0 },
+      { "color": "Caqui", "hex": "#b39b6b", "photo_id": 19418966, "position": 1 }
+    ],
+    "variants": [
+      { "size": "6", "color": "Blanco", "price": null, "stock": 2 },
+      { "size": "6", "color": "Caqui", "price": null, "stock": 1 },
+      { "size": "8", "color": "Blanco", "price": null, "stock": 2 },
+      { "size": "8", "color": "Caqui", "price": null, "stock": 1 },
+      { "size": "10", "color": "Blanco", "price": null, "stock": 2 },
+      { "size": "10", "color": "Caqui", "price": null, "stock": 2 },
+      { "size": "12", "color": "Blanco", "price": null, "stock": 2 },
+      { "size": "12", "color": "Caqui", "price": null, "stock": 1 },
+      { "size": "14", "color": "Blanco", "price": null, "stock": 0 },
+      { "size": "14", "color": "Caqui", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "VES-001",
+    "name": "Vestido para niñas en gasa francesa color blanco",
+    "description": "Vestido · Niñas",
+    "base_price": 250.00,
+    "store_key": "FL-87858D22",
+    "category": "Vestido",
+    "audience": "ninas",
+    "material": "airy French chiffon in layered, flowing tiers",
+    "colors": [
+      { "color": "Blanco", "hex": "#f7f3ea", "photo_id": 38870218, "position": 0 },
+      { "color": "Rosa", "hex": "#f2b5c6", "photo_id": 36893911, "position": 1 }
+    ],
+    "variants": [
+      { "size": "2", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "2", "color": "Rosa", "price": null, "stock": 1 },
+      { "size": "4", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "4", "color": "Rosa", "price": null, "stock": 1 },
+      { "size": "6", "color": "Blanco", "price": null, "stock": 2 },
+      { "size": "6", "color": "Rosa", "price": null, "stock": 1 },
+      { "size": "8", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "8", "color": "Rosa", "price": null, "stock": 1 },
+      { "size": "10", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "10", "color": "Rosa", "price": null, "stock": 0 },
+      { "size": "12", "color": "Blanco", "price": null, "stock": 0 },
+      { "size": "12", "color": "Rosa", "price": null, "stock": 0 },
+      { "size": "14", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "14", "color": "Rosa", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "VES-002",
+    "name": "Vestido Floreado rojo para niña",
+    "description": "Vestido · Niñas",
+    "base_price": 95.00,
+    "store_key": "FL-7A57A352",
+    "category": "Vestido",
+    "audience": "ninas",
+    "material": "soft cotton poplin with a printed floral pattern",
+    "colors": [
+      { "color": "Rojo", "hex": "#c8102e", "photo_id": 2995309, "position": 0 },
+      { "color": "Fucsia", "hex": "#d63384", "photo_id": 29169257, "position": 1 }
+    ],
+    "variants": [
+      { "size": "2", "color": "Rojo", "price": null, "stock": 2 },
+      { "size": "2", "color": "Fucsia", "price": null, "stock": 1 },
+      { "size": "4", "color": "Rojo", "price": null, "stock": 2 },
+      { "size": "4", "color": "Fucsia", "price": null, "stock": 2 },
+      { "size": "6", "color": "Rojo", "price": null, "stock": 2 },
+      { "size": "6", "color": "Fucsia", "price": null, "stock": 2 },
+      { "size": "8", "color": "Rojo", "price": null, "stock": 2 },
+      { "size": "8", "color": "Fucsia", "price": null, "stock": 1 },
+      { "size": "10", "color": "Rojo", "price": null, "stock": 1 },
+      { "size": "10", "color": "Fucsia", "price": null, "stock": 1 },
+      { "size": "12", "color": "Rojo", "price": null, "stock": 1 },
+      { "size": "12", "color": "Fucsia", "price": null, "stock": 1 },
+      { "size": "14", "color": "Rojo", "price": null, "stock": 1 },
+      { "size": "14", "color": "Fucsia", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "VES-003",
+    "name": "vestido de niña en gasa de seda",
+    "description": "Vestido · Niñas",
+    "base_price": 260.00,
+    "store_key": "FL-9567552E",
+    "category": "Vestido",
+    "audience": "ninas",
+    "material": "silk chiffon with a soft sheen and gathered tulle skirt",
+    "colors": [
+      { "color": "Celeste", "hex": "#7fb6e6", "photo_id": 34351470, "position": 0 },
+      { "color": "Champagne", "hex": "#e6d3ad", "photo_id": 14213044, "position": 1 }
+    ],
+    "variants": [
+      { "size": "2", "color": "Celeste", "price": null, "stock": 1 },
+      { "size": "2", "color": "Champagne", "price": null, "stock": 0 },
+      { "size": "4", "color": "Celeste", "price": null, "stock": 1 },
+      { "size": "4", "color": "Champagne", "price": null, "stock": 1 },
+      { "size": "6", "color": "Celeste", "price": null, "stock": 1 },
+      { "size": "6", "color": "Champagne", "price": null, "stock": 1 },
+      { "size": "8", "color": "Celeste", "price": null, "stock": 1 },
+      { "size": "8", "color": "Champagne", "price": null, "stock": 1 },
+      { "size": "10", "color": "Celeste", "price": null, "stock": 1 },
+      { "size": "10", "color": "Champagne", "price": null, "stock": 0 },
+      { "size": "12", "color": "Celeste", "price": null, "stock": 1 },
+      { "size": "12", "color": "Champagne", "price": null, "stock": 0 },
+      { "size": "14", "color": "Celeste", "price": null, "stock": 0 },
+      { "size": "14", "color": "Champagne", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "VES-004",
+    "name": "vestido Floreado azul para niña",
+    "description": "Vestido · Niñas",
+    "base_price": 95.00,
+    "store_key": "FL-B8D98B59",
+    "category": "Vestido",
+    "audience": "ninas",
+    "material": "light cotton fabric with a printed pattern",
+    "colors": [
+      { "color": "Azul", "hex": "#5b7fc4", "photo_id": 38247111, "position": 0 },
+      { "color": "Amarillo", "hex": "#f2c230", "photo_id": 17361104, "position": 1 }
+    ],
+    "variants": [
+      { "size": "2", "color": "Azul", "price": null, "stock": 1 },
+      { "size": "2", "color": "Amarillo", "price": null, "stock": 1 },
+      { "size": "4", "color": "Azul", "price": null, "stock": 2 },
+      { "size": "4", "color": "Amarillo", "price": null, "stock": 1 },
+      { "size": "6", "color": "Azul", "price": null, "stock": 2 },
+      { "size": "6", "color": "Amarillo", "price": null, "stock": 1 },
+      { "size": "8", "color": "Azul", "price": null, "stock": 1 },
+      { "size": "8", "color": "Amarillo", "price": null, "stock": 1 },
+      { "size": "10", "color": "Azul", "price": null, "stock": 1 },
+      { "size": "10", "color": "Amarillo", "price": null, "stock": 1 },
+      { "size": "12", "color": "Azul", "price": null, "stock": 1 },
+      { "size": "12", "color": "Amarillo", "price": null, "stock": 0 },
+      { "size": "14", "color": "Azul", "price": null, "stock": 1 },
+      { "size": "14", "color": "Amarillo", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "CON-002",
+    "name": "Conjunto de niña: pantalón cargo y polo",
+    "description": "Conjunto · Niñas",
+    "base_price": 125.00,
+    "store_key": "FL-956759D3",
+    "category": "Conjunto",
+    "audience": "ninas",
+    "material": "cotton cargo trousers with patch pockets and a soft jersey polo",
+    "colors": [
+      { "color": "Rosa", "hex": "#e88aa8", "photo_id": 29242786, "position": 0 },
+      { "color": "Jean y blanco", "hex": "#5b7fb0", "photo_id": 8576208, "position": 1 }
+    ],
+    "variants": [
+      { "size": "6", "color": "Rosa", "price": null, "stock": 1 },
+      { "size": "6", "color": "Jean y blanco", "price": null, "stock": 1 },
+      { "size": "8", "color": "Rosa", "price": null, "stock": 2 },
+      { "size": "8", "color": "Jean y blanco", "price": null, "stock": 1 },
+      { "size": "10", "color": "Rosa", "price": null, "stock": 2 },
+      { "size": "10", "color": "Jean y blanco", "price": null, "stock": 1 },
+      { "size": "12", "color": "Rosa", "price": null, "stock": 1 },
+      { "size": "12", "color": "Jean y blanco", "price": null, "stock": 1 },
+      { "size": "14", "color": "Rosa", "price": null, "stock": 1 },
+      { "size": "14", "color": "Jean y blanco", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "CON-003",
+    "name": "Conjunto para niña: pantalón y polo",
+    "description": "Conjunto · Niñas",
+    "base_price": 125.00,
+    "store_key": "FL-579576AE",
+    "category": "Conjunto",
+    "audience": "ninas",
+    "material": "cotton trousers with a soft jersey polo shirt",
+    "colors": [
+      { "color": "Verde", "hex": "#5f6b3a", "photo_id": 1620808, "position": 0 },
+      { "color": "Mostaza", "hex": "#d9a730", "photo_id": 20433625, "position": 1 }
+    ],
+    "variants": [
+      { "size": "6", "color": "Verde", "price": null, "stock": 1 },
+      { "size": "6", "color": "Mostaza", "price": null, "stock": 1 },
+      { "size": "8", "color": "Verde", "price": null, "stock": 1 },
+      { "size": "8", "color": "Mostaza", "price": null, "stock": 1 },
+      { "size": "10", "color": "Verde", "price": null, "stock": 2 },
+      { "size": "10", "color": "Mostaza", "price": null, "stock": 1 },
+      { "size": "12", "color": "Verde", "price": null, "stock": 1 },
+      { "size": "12", "color": "Mostaza", "price": null, "stock": 1 },
+      { "size": "14", "color": "Verde", "price": null, "stock": 1 },
+      { "size": "14", "color": "Mostaza", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "CAL-002",
+    "name": "Vapatos para niñas en gamuza importada",
+    "description": "Calzado · Niñas",
+    "base_price": 65.00,
+    "store_key": "FL-7A57A382",
+    "category": "Calzado",
+    "audience": "ninas",
+    "material": "soft matte suede with a velvety nap",
+    "colors": [
+      { "color": "Blanco", "hex": "#f4f1ea", "photo_id": 26698570, "position": 0 },
+      { "color": "Rosa", "hex": "#e8a3b8", "photo_id": 10383737, "position": 1 }
+    ],
+    "variants": [
+      { "size": "8", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "8", "color": "Rosa", "price": null, "stock": 1 },
+      { "size": "10", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "10", "color": "Rosa", "price": null, "stock": 1 },
+      { "size": "12", "color": "Blanco", "price": null, "stock": 1 },
+      { "size": "12", "color": "Rosa", "price": null, "stock": 0 }
+    ]
+  },
+  {
+    "id": "ACC-001",
+    "name": "Panty para niñas",
+    "description": "Accesorio · Niñas",
+    "base_price": 18.00,
+    "store_key": "FL-B8D98A58",
+    "category": "Accesorio",
+    "audience": "ninas",
+    "material": "fine opaque knit nylon tights",
+    "colors": [
+      { "color": "Blanco", "hex": "#f4f1ea", "photo_id": 7788328, "position": 0 },
+      { "color": "Rosa", "hex": "#f2b5c6", "photo_id": 6274656, "position": 1 }
+    ],
+    "variants": [
+      { "size": "S", "color": "Blanco", "price": null, "stock": 3 },
+      { "size": "S", "color": "Rosa", "price": null, "stock": 3 },
+      { "size": "M", "color": "Blanco", "price": null, "stock": 3 },
+      { "size": "M", "color": "Rosa", "price": null, "stock": 2 }
+    ]
+  },
+  {
+    "id": "ACC-002",
+    "name": "Medias con blondas para niñas",
+    "description": "Accesorio · Niñas",
+    "base_price": 12.00,
+    "store_key": "FL-D5D75B98",
+    "category": "Accesorio",
+    "audience": "ninas",
+    "material": "soft cotton knit socks with delicate lace trim",
+    "colors": [
+      { "color": "Blanco", "hex": "#f4f1ea", "photo_id": 22605623, "position": 0 },
+      { "color": "Amarillo", "hex": "#f2c230", "photo_id": 5325678, "position": 1 }
+    ],
+    "variants": [
+      { "size": "S", "color": "Blanco", "price": null, "stock": 2 },
+      { "size": "S", "color": "Amarillo", "price": null, "stock": 2 },
+      { "size": "M", "color": "Blanco", "price": null, "stock": 2 },
+      { "size": "M", "color": "Amarillo", "price": null, "stock": 2 }
+    ]
+  },
+  {
+    "id": "ACC-003",
+    "name": "vincha para niña",
+    "description": "Accesorio · Niñas",
+    "base_price": 15.00,
+    "store_key": "FL-D5D75A8B",
+    "category": "Accesorio",
+    "audience": "ninas",
+    "material": "fabric-covered headband with a soft satin bow",
+    "colors": [
+      { "color": "rosa", "hex": "#f08aa6", "photo_id": 5094376, "position": 0 },
+      { "color": "Beige", "hex": "#e3d2b5", "photo_id": 26509786, "position": 1 }
+    ],
+    "variants": [
+      { "size": "Unica", "color": "rosa", "price": null, "stock": 4 },
+      { "size": "Unica", "color": "Beige", "price": null, "stock": 4 }
+    ]
+  }
+]
