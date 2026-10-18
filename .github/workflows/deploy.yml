@@ -1,73 +1,75 @@
-# Pipeline completo: web (Angular) + server (API Node) en un solo workflow.
-# GitHub Actions hace TODO el build; Vercel solo recibe el resultado ya construido.
-# Secretos (Vercel > Project > Settings > General):
-#   VERCEL_TOKEN = token de la CLI
-#   ORG_ID       = id del equipo   (team_...)
-#   PROJECT_ID   = id del proyecto (prj_...)
-name: Deploy
+# Gitflow de despliegue de la WEB en GitHub Pages.
+# Solo publica el frontend Angular. La API Node sigue en Vercel y se despliega
+# con la integracion de Git de Vercel (no pasa por aqui).
+# La app usa rutas con hash (withHashLocation), asi que no hace falta 404.html.
+#
+# Variable de repositorio en GitHub > Settings > Secrets and variables > Actions
+# (pestana "Variables", no "Secrets"):
+#   API_BASE_URL = https://tu-proyecto.vercel.app   (obligatoria)
+#   BASE_HREF    = opcional. Solo si usas dominio propio; por defecto /<repo>/
+name: Deploy Pages
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 
-# cancela el despliegue anterior si entra un commit nuevo
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# solo un deploy a la vez, y el nuevo cancela al que sigue en cola
 concurrency:
-  group: deploy-${{ github.ref }}
+  group: pages
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    name: Web + server
+  build:
+    name: Compilar web
     runs-on: ubuntu-latest
-    env:
-      VERCEL_ORG_ID: ${{ secrets.ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.PROJECT_ID }}
-
     steps:
       - uses: actions/checkout@v5
 
-      # Angular CLI 22 exige Node >= 22.22.3 o >= 24.15.0
+      # Angular CLI 22 exige Node >= 22.22.3
       - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            frontend/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
 
-      # ---------- SERVER ----------
-      - name: Instalar dependencias del server
-        run: npm ci
-
-      - name: Verificar server (tests)
-        run: npm test
-
-      # ---------- WEB ----------
-      - name: Instalar dependencias de la web
+      - name: Instalar dependencias
         run: npm ci
         working-directory: frontend
 
-      # vercel.json hace este mismo build, pero lo corremos aqui para validar
-      # que la web compila antes de publicar. El artefacto final lo genera
-      # "vercel build" mas abajo.
-      - name: Verificar web (ng build)
-        run: npm run build
+      # genera src/environments/environment.prod.ts con la URL de la API
+      - name: Apuntar a la API de produccion
+        run: node scripts/set-api-base.mjs "${{ vars.API_BASE_URL }}"
+
+      # base-href debe incluir el subdirectorio del repo en Pages
+      # (https://<usuario>.github.io/<repo>/). Con dominio propio va "/".
+      - name: Compilar
+        run: npm run build -- --base-href "${{ vars.BASE_HREF || format('/{0}/', github.event.repository.name) }}"
         working-directory: frontend
 
-      # ---------- EMPAQUETAR Y PUBLICAR ----------
-      - name: Instalar Vercel CLI
-        run: npm install --global vercel@latest
+      # evita que Pages pase los archivos por Jekyll
+      - name: Preparar artefacto
+        run: touch dist/frontend/browser/.nojekyll
+        working-directory: frontend
 
-      # descarga vercel.json + variables del proyecto (.vercel/)
-      - name: Descargar configuracion del proyecto
-        run: vercel pull --yes --environment=${{ github.event_name == 'pull_request' && 'preview' || 'production' }} --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Subir artefacto
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist/frontend/browser
 
-      # compila la web y empaqueta la funcion del server segun vercel.json
-      - name: Empaquetar web + server
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      # push a main = produccion; pull_request = vista previa con URL de revision
+  deploy:
+    name: Publicar en Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Publicar
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} ${{ github.event_name == 'pull_request' && '--target=preview' || '--prod' }}
+        id: deployment
+        uses: actions/deploy-pages@v4
