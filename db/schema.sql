@@ -72,3 +72,13 @@ CREATE TABLE IF NOT EXISTS product_colors (
 
 -- Material y textura de la prenda: el probador con IA lo usa para copiar la tela.
 ALTER TABLE products ADD COLUMN IF NOT EXISTS material text;
+
+-- Cupo del probador con IA: pruebas usadas por IP y por dia (fecha de Lima).
+-- El servidor reserva la prueba con un INSERT ... ON CONFLICT atomico, asi el
+-- limite se respeta aunque haya varias instancias (Vercel).
+CREATE TABLE IF NOT EXISTS probador_cupos (
+    fecha  date    NOT NULL,
+    ip     text    NOT NULL,
+    usadas integer NOT NULL DEFAULT 0 CHECK (usadas >= 0),
+    PRIMARY KEY (fecha, ip)
+);
