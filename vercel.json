@@ -1,19 +1,27 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": null,
-  "buildCommand": "",
-  "outputDirectory": ".",
-  "rewrites": [
-    { "source": "/api/:ruta*", "destination": "/api/index?ruta=:ruta*" },
-    { "source": "/", "destination": "/Angibellcreaciones.html" }
-  ],
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 60,
-      "includeFiles": "db/**"
+  "services": {
+    "frontend": {
+      "root": "frontend",
+      "framework": "angular"
+    },
+    "server": {
+      "root": "server",
+      "runtime": "node"
     }
   },
-  "headers": [
-    { "source": "/Angibellcreaciones.html", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "server"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend"
+      }
+    }
   ]
 }
