@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "db:init": "node db-init.js",
+    "seed:generate": "node ../db/generate-seed.js",
+    "seed": "node ../db/seed-from-json.js",
     "test": "node test/db.test.js"
   },
   "engines": {

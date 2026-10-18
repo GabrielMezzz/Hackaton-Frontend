@@ -82,3 +82,46 @@ CREATE TABLE IF NOT EXISTS probador_cupos (
     usadas integer NOT NULL DEFAULT 0 CHECK (usadas >= 0),
     PRIMARY KEY (fecha, ip)
 );
+
+-- ---------------------------------------------------------------------
+-- Modulo de Administracion: Categorias, Segregacion y Cloudinary
+-- ---------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS categories (
+    id          serial PRIMARY KEY,
+    name        text NOT NULL UNIQUE,
+    slug        text NOT NULL UNIQUE,
+    description text,
+    image_url   text,
+    active      boolean NOT NULL DEFAULT true,
+    created_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS category_products (
+    category_id integer NOT NULL REFERENCES categories (id) ON DELETE CASCADE,
+    product_id  text NOT NULL,
+    PRIMARY KEY (category_id, product_id)
+);
+
+CREATE TABLE IF NOT EXISTS product_color_images (
+    product_id text NOT NULL,
+    color      text NOT NULL,
+    url        text NOT NULL,
+    PRIMARY KEY (product_id, color)
+);
+
+INSERT INTO categories (name, slug, description)
+SELECT DISTINCT 
+    category,
+    lower(category),
+    'Prendas y accesorios en la categoría ' || category
+FROM products
+WHERE category IS NOT NULL AND category <> ''
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO category_products (category_id, product_id)
+SELECT c.id, p.id
+FROM products p
+JOIN categories c ON c.name = p.category
+ON CONFLICT (category_id, product_id) DO NOTHING;
+

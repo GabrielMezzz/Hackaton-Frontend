@@ -1170,6 +1170,14 @@ img[data-pw-img]:not([src]) { display: none !important; }
   transition: background .15s ease, transform .1s ease; border: 0; cursor: pointer;
 }
 .pw-ac-chat-btn-action:hover { background: #20ba59; transform: translateY(-1px); }
+.pw-ac-cart-quote-btn {
+  background: none; border: 0; color: #008069; cursor: pointer;
+  font-size: 12.5px; font-weight: 600; padding: 4px 0;
+  display: inline-flex; align-items: center; gap: 4px;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.pw-ac-cart-quote-btn:hover { color: #075e54; }
+.pw-ac-chip--highlight { background: #e7f7ed !important; border-color: #00a884 !important; color: #008069 !important; font-weight: 600; }
 
 /* Quick Action Chips */
 .pw-ac-chat-chips {
@@ -1563,11 +1571,11 @@ img[data-pw-img]:not([src]) { display: none !important; }
 
   /* ===================== Chat Pseudo-WhatsApp (webhook n8n) ===================== */
   var chatOpen = false;
-  var chatMessages = [];   // { role: 'bot'|'user', text: string }
+  var chatMessages = [];   // { role: 'bot'|'user', text: string, quote?: object, delegated?: bool }
   var chatBusy = false;
   var chatEndpoint = (function () {
     if (/^https?:$/.test(location.protocol)) return '/api/webhook-order';
-    return '';
+    return 'http://169.58.74.99:5678/webhook-test/web-order';
   })();
 
   function chatTime() {
@@ -1575,34 +1583,58 @@ img[data-pw-img]:not([src]) { display: none !important; }
     return d.getHours() + ':' + String(d.getMinutes()).replace(/^(\d)$/, '0$1');
   }
 
-  /* Construye el mensaje dinámico con el producto que el usuario está viendo */
-  function chatProductContext() {
+  /* Extrae la prenda, color, talla, sku y cantidad del contexto de visualización */
+  function getActiveProductDetails() {
     var h = (location.hash || '').replace(/^#\/?/, '');
     if (h.indexOf('prenda/') !== 0) return null;
     var idx = parseInt(h.slice(7), 10);
     var p = CATALOG[idx];
     if (!p) return null;
     var col = colorOf(p, sel.color);
+    var chosenSize = sel.size;
+    if (!chosenSize && p.sizes && p.sizes.length) {
+      for (var s = 0; s < p.sizes.length; s++) {
+        if (available(p, p.sizes[s]) > 0) {
+          chosenSize = p.sizes[s];
+          break;
+        }
+      }
+      if (!chosenSize) chosenSize = p.sizes[0];
+    }
     return {
+      product: p,
       name: p.name,
-      color: col ? col.nombre : null,
-      size: sel.size || null,
-      sku: p.sku || null
+      color: col ? col.nombre : (p.colors && p.colors[0] ? p.colors[0].nombre : 'Estándar'),
+      size: chosenSize || '0',
+      sku: p.sku || 'ANG-001',
+      qty: sel.qty || 1,
+      price: p.price
     };
   }
 
-  function chatBuildMessage(text) {
-    var ctx = chatProductContext();
-    if (!ctx) return text;
-    // Si el usuario escribe algo genérico, agregar el contexto del producto
-    var msg = 'Hola Angibell, quisiera consultar por ' + ctx.name;
-    if (ctx.color) msg += ' en color ' + ctx.color;
-    if (ctx.size) msg += ', talla ' + ctx.size;
-    if (ctx.sku) msg += ' (SKU ' + ctx.sku + ')';
-    // si el usuario escribio algo mas que solo "hola" o similar, agregarlo
-    var clean = text.replace(/^hola\s*/i, '').trim();
-    if (clean.length > 2) msg += '. ' + clean;
+  /* Genera el formato de mensaje que espera el webhook de n8n */
+  function formatQuoteMessage(item) {
+    if (!item) return '';
+    var msg = 'Hola Angibell, quisiera consultar por ' + item.name;
+    if (item.color) msg += ' en color ' + item.color;
+    if (item.size) msg += ', talla ' + item.size;
+    if (item.sku) msg += ' (SKU ' + item.sku + ')';
+    if (item.qty && item.qty > 1) msg += ' cantidad ' + item.qty;
     return msg;
+  }
+
+  function chatBuildMessage(text) {
+    // Si el texto ya contiene el formato requerido con SKU, se envía directamente
+    if (/SKU\s+[A-Za-z0-9_-]+/i.test(text)) return text;
+    var ctx = getActiveProductDetails();
+    if (!ctx) return text;
+    // Si el usuario escribe algo genérico pero está viendo una prenda, autocompletar con el producto
+    var base = formatQuoteMessage(ctx);
+    var clean = text.replace(/^hola\s*/i, '').trim();
+    if (clean.length > 2 && !/cotiz|precio|disponib/i.test(clean)) {
+      base += '. ' + clean;
+    }
+    return base;
   }
 
   function chatRender() {
@@ -1611,10 +1643,35 @@ img[data-pw-img]:not([src]) { display: none !important; }
     var html = '<div class="pw-ac-chat-date-pill">Hoy</div>';
     chatMessages.forEach(function (m) {
       var isBot = m.role === 'bot';
+      var quoteBox = '';
+      if (isBot && !m.streaming && m.quote && m.quote.id) {
+        var qLink = esc(waLink('Hola Angibell, sobre mi cotización #' + m.quote.id + (m.quote.total ? ' por S/ ' + m.quote.total : '') + ', quisiera coordinar el pago y la entrega.'));
+        quoteBox = '<div class="pw-ac-chat-quote-card">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">' +
+            '<strong>Cotización #' + esc(String(m.quote.id)) + '</strong>' +
+            (m.quote.total ? '<span style="font-weight:700;color:#0f5132;background:#e7f7ed;padding:2px 8px;border-radius:12px;font-size:12px">Total: S/ ' + esc(String(m.quote.total)) + '</span>' : '') +
+          '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">' +
+            '<a class="pw-ac-chat-btn-action" href="#/carrito" style="background:#008069">🛒 Ver Carrito</a>' +
+            '<a class="pw-ac-chat-btn-action" href="' + qLink + '" target="_blank" rel="noopener">📲 Asesor WhatsApp</a>' +
+          '</div>' +
+        '</div>';
+      } else if (isBot && !m.streaming && m.delegated) {
+        var activeProd = getActiveProductDetails();
+        if (activeProd) {
+          quoteBox = '<div style="margin-top:8px">' +
+            '<button type="button" class="pw-ac-chip pw-ac-chip--highlight" data-auto-quote="1">' +
+              '✨ Cotizar "' + esc(activeProd.name) + '" automáticamente' +
+            '</button>' +
+          '</div>';
+        }
+      }
+
       html += '<div class="pw-ac-msg pw-ac-msg--' + (isBot ? 'bot' : 'user') + '">' +
         '<div class="pw-ac-bubble">' +
           '<span class="pw-ac-msg-text">' + chatFormatText(m.text) + '</span>' +
           (m.streaming ? '<span class="pw-ac-cursor"></span>' : '') +
+          quoteBox +
           '<span class="pw-ac-msg-meta">' + chatTime() +
             (isBot ? '' : ' <span class="pw-ac-ticks">✓✓</span>') +
           '</span>' +
@@ -1631,9 +1688,8 @@ img[data-pw-img]:not([src]) { display: none !important; }
   }
 
   function chatFormatText(text) {
-    // Escapar HTML y convertir \n a <br>, emojis y negritas simples
+    if (!text) return '';
     var s = esc(text).replace(/\n/g, '<br>');
-    // Negritas entre asteriscos: *texto* → <strong>texto</strong>
     s = s.replace(/\*([^*]+)\*/g, '<strong>$1</strong>');
     return s;
   }
@@ -1649,18 +1705,33 @@ img[data-pw-img]:not([src]) { display: none !important; }
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: message })
-    }).then(function (r) { return r.json(); }).then(function (data) {
+    }).then(function (r) {
+      return r.json();
+    }).then(function (data) {
       chatBusy = false;
-      // Extraer el texto de respuesta del webhook
       var botText = data.summary || data.message || data.error || 'Gracias por tu consulta. Un asesor te atenderá pronto.';
-      // Agregar mensaje del bot con efecto streaming
-      var botMsg = { role: 'bot', text: '', streaming: true };
+      var botMsg = {
+        role: 'bot',
+        text: '',
+        streaming: true,
+        quote: (data.quote_id || data.summary) ? {
+          id: data.quote_id || 'AUTO',
+          total: data.total || '',
+          status: data.status || 'pending_advisor',
+          available: data.available !== false
+        } : null,
+        delegated: !!data.delegated,
+        catalog_url: data.catalog_url
+      };
       chatMessages.push(botMsg);
       chatRender();
       chatStreamText(botMsg, botText, 0);
     }).catch(function (err) {
       chatBusy = false;
-      chatMessages.push({ role: 'bot', text: 'Lo sentimos, no pudimos conectar con nuestro asistente en este momento. Puedes escribirnos directamente por WhatsApp.' });
+      chatMessages.push({
+        role: 'bot',
+        text: 'Lo sentimos, hubo un inconveniente al conectar con el asistente de cotización. Puedes escribirnos directamente a WhatsApp.'
+      });
       chatRender();
     });
   }
@@ -1672,11 +1743,82 @@ img[data-pw-img]:not([src]) { display: none !important; }
       chatRender();
       return;
     }
-    // Avanzar entre 1 y 3 caracteres por tick para que sea rápido pero natural
     var step = Math.min(3, fullText.length - idx);
     msg.text = fullText.slice(0, idx + step);
     chatRender();
     setTimeout(function () { chatStreamText(msg, fullText, idx + step); }, 12);
+  }
+
+  function chatSubmitUserMessage(text) {
+    if (chatBusy || !text) return;
+    chatMessages.push({ role: 'user', text: text });
+    chatRender();
+    chatSendToWebhook(text);
+  }
+
+  function openChatForProductQuote(p) {
+    var details = getActiveProductDetails();
+    if (!details) {
+      if (!chatOpen) chatToggle();
+      return;
+    }
+    var msg = formatQuoteMessage(details);
+    if (!chatOpen) chatToggle();
+    chatSubmitUserMessage(msg);
+  }
+
+  function openChatForCartQuote(cartIdx) {
+    if (!cart.length) return;
+    var item = (typeof cartIdx === 'number' && cart[cartIdx]) ? cart[cartIdx] : cart[0];
+    var details = {
+      name: item.name,
+      color: item.color || 'Estándar',
+      size: item.size || 'Estándar',
+      sku: item.sku || 'ANG-001',
+      qty: item.qty || 1
+    };
+    var msg = formatQuoteMessage(details);
+    if (!chatOpen) chatToggle();
+    chatSubmitUserMessage(msg);
+  }
+
+  function chatUpdateChips() {
+    var chipsContainer = document.getElementById('acChatChips');
+    if (!chipsContainer) return;
+
+    var prod = getActiveProductDetails();
+    var h = (location.hash || '').replace(/^#\/?/, '');
+    var isCart = h === 'carrito';
+    var chips = [];
+
+    if (prod) {
+      chips.push({
+        label: '✨ Cotizar ' + esc(prod.name.length > 18 ? prod.name.slice(0, 18) + '…' : prod.name),
+        msg: formatQuoteMessage(prod)
+      });
+      chips.push({
+        label: '📦 Disponibilidad',
+        msg: 'Hola Angibell, quisiera saber la disponibilidad de ' + prod.name + ' (SKU ' + prod.sku + ')'
+      });
+    } else if (isCart && cart.length > 0) {
+      for (var i = 0; i < Math.min(2, cart.length); i++) {
+        var it = cart[i];
+        chips.push({
+          label: '🛒 Cotizar ' + esc(it.name.length > 15 ? it.name.slice(0, 15) + '…' : it.name),
+          msg: formatQuoteMessage({ name: it.name, color: it.color, size: it.size, sku: it.sku, qty: it.qty })
+        });
+      }
+    } else {
+      chips.push({ label: '💰 Solicitar cotización', msg: 'Hola Angibell, quisiera consultar por una prenda.' });
+      chips.push({ label: '📦 Consultar disponibilidad', msg: 'Hola Angibell, ¿tienen disponibilidad de prendas en stock?' });
+    }
+
+    chips.push({ label: '📏 Guía de tallas', msg: 'Hola Angibell, ¿cuáles son las tallas disponibles y medidas?' });
+    chips.push({ label: '🚚 Envíos a domicilio', msg: 'Hola Angibell, ¿hacen envíos a domicilio?' });
+
+    chipsContainer.innerHTML = chips.map(function (c) {
+      return '<button type="button" class="pw-ac-chip" data-chip="' + esc(c.msg) + '">' + c.label + '</button>';
+    }).join('');
   }
 
   function chatToggle() {
@@ -1691,13 +1833,13 @@ img[data-pw-img]:not([src]) { display: none !important; }
       btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 18L18 6M6 6l12 12"/></svg>';
       chat.style.display = 'flex';
       if (badge) badge.style.display = 'none';
-      // Mensaje de bienvenida solo la primera vez
       if (!chatMessages.length) {
         chatMessages.push({
           role: 'bot',
-          text: '¡Hola! 👋 Soy el asistente de Angibell Creaciones.\n\nPuedo ayudarte con:\n• Consultar disponibilidad y precios\n• Generar tu cotización al instante\n• Resolver tus dudas\n\n¿En qué te puedo ayudar?'
+          text: '¡Hola! 👋 Soy el asistente de Angibell Creaciones.\n\nPuedo ayudarte con:\n• Consultar disponibilidad y precios\n• Generar tu cotización al instante\n• Resolver tus dudas\n\n¿En qué te puedo ayudar hoy?'
         });
       }
+      chatUpdateChips();
       chatRender();
       var input = document.getElementById('acChatInput');
       if (input) setTimeout(function () { input.focus(); }, 200);
@@ -1714,16 +1856,12 @@ img[data-pw-img]:not([src]) { display: none !important; }
     var text = input.value.trim();
     if (!text || chatBusy) return;
     input.value = '';
-    chatMessages.push({ role: 'user', text: text });
-    chatRender();
-    chatSendToWebhook(text);
+    chatSubmitUserMessage(text);
   }
 
   function chatHandleChip(text) {
-    if (chatBusy) return;
-    chatMessages.push({ role: 'user', text: text });
-    chatRender();
-    chatSendToWebhook(text);
+    if (chatBusy || !text) return;
+    chatSubmitUserMessage(text);
   }
 
   function injectWhatsapp() {
@@ -1748,12 +1886,7 @@ img[data-pw-img]:not([src]) { display: none !important; }
           '</div>' +
         '</div>' +
         '<div class="pw-ac-chat-body" id="acChatBody"></div>' +
-        '<div class="pw-ac-chat-chips" id="acChatChips">' +
-          '<button class="pw-ac-chip" data-chip="Hola, quisiera una cotización">💰 Cotizar</button>' +
-          '<button class="pw-ac-chip" data-chip="¿Tienen disponibilidad?">📦 Disponibilidad</button>' +
-          '<button class="pw-ac-chip" data-chip="¿Cuáles son las tallas disponibles?">📏 Tallas</button>' +
-          '<button class="pw-ac-chip" data-chip="¿Hacen envíos?">🚚 Envíos</button>' +
-        '</div>' +
+        '<div class="pw-ac-chat-chips" id="acChatChips"></div>' +
         '<div class="pw-ac-chat-footer">' +
           '<input class="pw-ac-chat-input" id="acChatInput" type="text" placeholder="Escribe un mensaje..." autocomplete="off">' +
           '<button class="pw-ac-chat-send" id="acChatSend" aria-label="Enviar">' +
@@ -1782,6 +1915,15 @@ img[data-pw-img]:not([src]) { display: none !important; }
       var chip = e.target.closest('.pw-ac-chip');
       if (chip) chatHandleChip(chip.getAttribute('data-chip'));
     });
+    document.getElementById('acChatBody').addEventListener('click', function (e) {
+      var autoBtn = e.target.closest('[data-auto-quote]');
+      if (autoBtn) {
+        var prod = getActiveProductDetails();
+        if (prod) chatSubmitUserMessage(formatQuoteMessage(prod));
+      }
+    });
+
+    chatUpdateChips();
   }
 
   /* ===================== catalogo ===================== */
@@ -1789,6 +1931,27 @@ img[data-pw-img]:not([src]) { display: none !important; }
   var CATALOG = [];
   var BY_KEY = {};
   var CAT_NAMES = { ninas: 'Niñas', ninos: 'Niños', personalizados: 'Personalizados', todo: 'Todo el catálogo' };
+
+  var SKU_MAP = {
+    'FL-63E73D38': 'TER-001',
+    'FL-95675A2E': 'TER-002',
+    'FL-D5D758B5': 'BLA-001',
+    'FL-7A5767B6': 'CON-001',
+    'FL-87A6368E': 'PAN-001',
+    'FL-87A63626': 'TIR-001',
+    'FL-63E7A7ED': 'CAL-001',
+    'FL-63E7A7A9': 'PAN-002',
+    'FL-87858D22': 'VES-001',
+    'FL-7A57A352': 'VES-002',
+    'FL-9567552E': 'VES-003',
+    'FL-B8D98B59': 'VES-004',
+    'FL-956759D3': 'CON-002',
+    'FL-579576AE': 'CON-003',
+    'FL-7A57A382': 'CAL-002',
+    'FL-B8D98A58': 'ACC-001',
+    'FL-D5D75B98': 'ACC-002',
+    'FL-D5D75A8B': 'ACC-003'
+  };
 
   function buildCatalog() {
     CARDS = Array.prototype.slice.call(document.querySelectorAll('.style-module__9e2z6a__productCard'));
@@ -1814,7 +1977,7 @@ img[data-pw-img]:not([src]) { display: none !important; }
         key: key,
         colores: data.colores || [],
         eyebrow: eyebrow,
-        sku: data.sku || ('SKU-' + key),
+        sku: data.sku || SKU_MAP[key] || ('SKU-' + key),
         tipo: data.tipo || null,
         publico: publico,
         sizes: data.sizes || {},
@@ -2091,7 +2254,7 @@ img[data-pw-img]:not([src]) { display: none !important; }
 
             '<div class="pw-ac-actions">' +
               '<button type="button" class="pw-btn pw-btn--primary" id="acAdd">Agregar al carrito</button>' +
-              '<a class="pw-btn pw-btn--secondary" id="acAsk" target="_blank" rel="noopener" style="display:block">Consultar por WhatsApp</a>' +
+              '<button type="button" class="pw-btn pw-btn--secondary" id="acAsk" style="display:inline-flex;align-items:center;justify-content:center;gap:6px">💬 Cotizar por WhatsApp</button>' +
             '</div>' +
             '<div id="acAdded" class="pw-ac-stock" style="display:none;margin-top:12px" role="status"></div>' +
             (PROMO_3X2 ? '<p class="pw-ac-promo-note"><strong>Compra 2 y lleva 3:</strong> en cada grupo de tres prendas, la de menor precio es gratis. Se descuenta sola en el carrito.</p>' : '') +
@@ -2168,10 +2331,10 @@ img[data-pw-img]:not([src]) { display: none !important; }
     var q = $('acQty');
     q.max = n > 0 ? n : 1;
     q.value = sel.qty;
-    var col = colorOf(p, sel.color);
-    $('acAsk').href = waLink('Hola Angibell, quisiera consultar por "' + p.name + '"' +
-      (col ? ' en color ' + col.nombre : '') +
-      (sel.size ? ', talla ' + sel.size : '') + ' (SKU ' + p.sku + ').');
+    var ask = $('acAsk');
+    if (ask) {
+      ask.setAttribute('title', 'Consultar y cotizar "' + p.name + '" con nuestro asistente de WhatsApp');
+    }
   }
 
   function setQty(p, n) {
@@ -2235,6 +2398,13 @@ img[data-pw-img]:not([src]) { display: none !important; }
     $('acPlus').addEventListener('click', function () { setQty(p, sel.qty + 1); });
     $('acQty').addEventListener('change', function () { setQty(p, parseInt(this.value, 10) || 1); });
     $('acAdd').addEventListener('click', function () { addToCart(p); });
+    var askBtn = $('acAsk');
+    if (askBtn) {
+      askBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openChatForProductQuote(p);
+      });
+    }
 
     var colors = $('acColors');
     if (colors) colors.addEventListener('click', function (e) {
@@ -2722,7 +2892,11 @@ img[data-pw-img]:not([src]) { display: none !important; }
             '<p class="pw-ac-cart-meta">' +
               (i.color ? '<span class="pw-ac-dot" style="background:' + esc(i.colorHex) + '"></span>' + esc(i.color) + ' · ' : '') +
               'Talla ' + esc(i.size) + ' · SKU ' + esc(i.sku) +
-              ' · ' + esc(money(i.price)) + ' c/u</p></div>' +
+              ' · ' + esc(money(i.price)) + ' c/u</p>' +
+              '<button type="button" class="pw-ac-cart-quote-btn" data-quote-cart="' + n + '">' +
+                '💬 Cotizar por WhatsApp' +
+              '</button>' +
+            '</div>' +
             '<div class="pw-ac-qty"><button type="button" data-dec="' + n + '" aria-label="Quitar uno"' + (i.qty <= 1 ? ' disabled' : '') + '>−</button>' +
               '<input type="number" value="' + i.qty + '" min="1" max="' + max + '" data-qty="' + n + '" aria-label="Cantidad de ' + esc(i.name) + '">' +
               '<button type="button" data-inc="' + n + '" aria-label="Agregar uno"' + (i.qty >= max ? ' disabled' : '') + '>+</button></div>' +
@@ -2737,12 +2911,21 @@ img[data-pw-img]:not([src]) { display: none !important; }
           : '') +
         '<div class="pw-ac-cart-actions pw-ac-cart-actions--end" style="margin-top:24px">' +
           '<a class="pw-btn pw-btn--secondary" href="#/categoria/todo">Seguir comprando</a>' +
+          '<button type="button" class="pw-btn pw-btn--secondary" id="acCartQuoteBtn" style="border-color:#25d366;color:#075e54;font-weight:600;display:inline-flex;align-items:center;gap:6px">' +
+            '💬 Cotizar carrito por WhatsApp' +
+          '</button>' +
           '<a class="pw-btn pw-btn--primary" href="#/checkout">Continuar con la compra</a>' +
         '</div>' +
       '</div>';
 
     v.addEventListener('click', onCartClick);
     v.addEventListener('change', onCartChange);
+    var cartQuoteBtn = $('acCartQuoteBtn');
+    if (cartQuoteBtn) {
+      cartQuoteBtn.addEventListener('click', function () {
+        openChatForCartQuote(0);
+      });
+    }
     hydrateArt(v);
     showView('cart');
   }
@@ -2757,6 +2940,11 @@ img[data-pw-img]:not([src]) { display: none !important; }
   function onCartClick(e) {
     var t = e.target.closest ? e.target.closest('button') : null;
     if (!t || t.disabled) return;
+    var quoteCart = t.getAttribute('data-quote-cart');
+    if (quoteCart !== null) {
+      openChatForCartQuote(+quoteCart);
+      return;
+    }
     var inc = t.getAttribute('data-inc');
     var dec = t.getAttribute('data-dec');
     var del = t.getAttribute('data-del');
@@ -3361,7 +3549,7 @@ img[data-pw-img]:not([src]) { display: none !important; }
     buildCatalog(); loadCart(); injectCartButton(); injectWhatsapp(); interceptProducts(); paintBadge();
     fixMenu(); blockExternal(); fixFooter();
   }
-  window.addEventListener('hashchange', function () { route(); });
+  window.addEventListener('hashchange', function () { route(); chatUpdateChips(); });
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { run(); route(); });
   else { run(); route(); }

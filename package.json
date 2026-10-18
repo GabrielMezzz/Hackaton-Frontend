@@ -5,6 +5,9 @@
   "engines": { "node": ">=18" },
   "scripts": {
     "start": "node server/server.js",
+    "db:init": "node server/db-init.js",
+    "seed:generate": "node db/generate-seed.js",
+    "seed": "node db/seed-from-json.js",
     "test": "node server/test/db.test.js"
   },
   "dependencies": {
