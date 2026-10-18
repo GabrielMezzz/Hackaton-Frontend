@@ -45,6 +45,7 @@ jobs:
       # genera src/environments/environment.prod.ts con la URL de la API
       - name: Apuntar a la API de produccion
         run: node scripts/set-api-base.mjs "${{ vars.API_BASE_URL }}"
+        working-directory: frontend
 
       # base-href debe incluir el subdirectorio del repo en Pages
       # (https://<usuario>.github.io/<repo>/). Con dominio propio va "/".
