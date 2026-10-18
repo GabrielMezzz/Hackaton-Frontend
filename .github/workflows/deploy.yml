@@ -1,0 +1,72 @@
+# Pipeline completo: web (Angular) + server (API Node) en un solo workflow.
+# GitHub Actions hace TODO el build; Vercel solo recibe el resultado ya construido.
+# Secretos (Vercel > Project > Settings > General):
+#   VERCEL_TOKEN = token de la CLI
+#   ORG_ID       = id del equipo   (team_...)
+#   PROJECT_ID   = id del proyecto (prj_...)
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# cancela el despliegue anterior si entra un commit nuevo
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Web + server
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+
+      # ---------- SERVER ----------
+      - name: Instalar dependencias del server
+        run: npm ci
+
+      - name: Verificar server (tests)
+        run: npm test
+
+      # ---------- WEB ----------
+      - name: Instalar dependencias de la web
+        run: npm ci
+        working-directory: frontend
+
+      # vercel.json hace este mismo build, pero lo corremos aqui para validar
+      # que la web compila antes de publicar. El artefacto final lo genera
+      # "vercel build" mas abajo.
+      - name: Verificar web (ng build)
+        run: npm run build
+        working-directory: frontend
+
+      # ---------- EMPAQUETAR Y PUBLICAR ----------
+      - name: Instalar Vercel CLI
+        run: npm install --global vercel@latest
+
+      # descarga vercel.json + variables del proyecto (.vercel/)
+      - name: Descargar configuracion del proyecto
+        run: vercel pull --yes --environment=${{ github.event_name == 'pull_request' && 'preview' || 'production' }} --token=${{ secrets.VERCEL_TOKEN }}
+
+      # compila la web y empaqueta la funcion del server segun vercel.json
+      - name: Empaquetar web + server
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      # push a main = produccion; pull_request = vista previa con URL de revision
+      - name: Publicar
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} ${{ github.event_name == 'pull_request' && '--target=preview' || '--prod' }}
