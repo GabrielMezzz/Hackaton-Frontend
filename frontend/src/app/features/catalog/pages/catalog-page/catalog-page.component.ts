@@ -94,15 +94,18 @@ export class CatalogPageComponent {
   readonly selectedCategory = signal<string>('todo');
 
   readonly filteredProducts = computed(() => {
-    const cat = this.selectedCategory().toLowerCase();
+    const normalize = (s: string) =>
+      (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ñ/g, 'n').trim();
+
+    const cat = normalize(this.selectedCategory());
     const all = this.catalog.products();
     if (cat === 'todo' || !cat) return all;
 
     return all.filter(p => {
-      const pTipo = (p.tipo || '').toLowerCase();
-      const pSlug = (p.category_slug || '').toLowerCase();
-      const pName = (p.categoria || p.category_name || '').toLowerCase();
-      const pPublico = (p.publico || '').toLowerCase();
+      const pTipo = normalize(p.tipo);
+      const pSlug = normalize(p.category_slug || '');
+      const pName = normalize(p.categoria || p.category_name || '');
+      const pPublico = normalize(p.publico || '');
 
       return pTipo === cat || pSlug === cat || pName === cat || pPublico === cat;
     });
