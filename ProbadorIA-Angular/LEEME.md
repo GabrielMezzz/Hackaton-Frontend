@@ -50,9 +50,17 @@ se mueve con mouse, dedo o flechas del teclado.
 
 ## Imágenes
 
-`imgBase` (por defecto `assets/prendas/`) apunta a la carpeta donde copias los
-archivos de `Angibell creaciones_files/`. Los nombres son los que aparecen en
-`prenda.img` (p. ej. `FL-63E73D38`).
+La tienda ya no guarda imágenes en la carpeta. Las fotos de las prendas vienen de
+Pexels (`https://images.pexels.com/photos/<id>/pexels-photo-<id>.jpeg`) y se
+repintan en el navegador con el color que elige el cliente (`../recolor-prendas.js`).
+El id de cada foto y sus colores están en la base de datos (tabla `product_colors`, ver `../db/`).
+
+Para usar el componente con esas fotos, pasa la URL completa en `img` y deja
+`imgBase` vacío:
+
+```html
+<app-probador-ia [prenda]="prenda" [imgBase]="''"></app-probador-ia>
+```
 
 ## Lo que aun no esta en Angular
 
